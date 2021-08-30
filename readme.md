@@ -1,5 +1,8 @@
-PicoScheme
+PicoScheme ESP32
 ==========
+
+The ESP32 version of the PicoScheme
+
 A small, embeddable scheme interpreter in c++17. This project started as a
 test bed to evaluate the new [std::variant] class template as plain c-union
 replacement and to test shared, reference counting pointers for basic memory
