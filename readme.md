@@ -3,7 +3,7 @@ PicoScheme ESP32
 
 **Annotation**
 
-The branch of [PicoScheme](https://github.com/arichel/PicoScheme) but modifyed for ESP32 MCU
+The branch of [PicoScheme](https://github.com/arichel/PicoScheme) but modifyed for ESP32 MCU. Ti use drop it to the *components* folder of your project.
 
 ### Introduction ###
 A small, embeddable scheme interpreter in c++17. This project started as a
