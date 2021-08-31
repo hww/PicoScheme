@@ -3,7 +3,17 @@ PicoScheme ESP32
 
 **Annotation**
 
-The branch of [PicoScheme](https://github.com/arichel/PicoScheme) but modifyed for ESP32 MCU and *idf* toolschain. Drop it to the *components* folder of your ESP32 project, then enable exceptions with *menuconfig*.
+The branch of [PicoScheme](https://github.com/arichel/PicoScheme) but modifyed for ESP32 MCU and *idf* toolschain. Drop it to the *components* folder of your ESP32 project, then enable exceptions with *menuconfig*. Also enable C++17 support for your project (see below)
+
+```
+cmake_minimum_required(VERSION 3.5)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+
+project(esp32)
+```
 
 ### Introduction ###
 A small, embeddable scheme interpreter in c++17. This project started as a
