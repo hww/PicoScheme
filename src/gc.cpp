@@ -9,6 +9,12 @@
 
 namespace pscm {
 
+OSTREAM& operator<<(OSTREAM& os, const Cons& cons)
+{
+    os << "(" << car(cons) << " " << cdr(cons) << ")";
+    return os;
+}
+
 void GCollector::collect(Scheme& scm, const SymenvPtr& env)
 {
     // Mark phase: mark all reacheable cons-cells
@@ -27,7 +33,7 @@ void GCollector::collect(Scheme& scm, const SymenvPtr& env)
     // Optional log number of released cells
     if (logon) {
         size_t dlta = size - scm.store.size();
-        std::cerr << "msg> garbage collector released " << dlta
+        CERR << "msg> garbage collector released " << dlta
                   << " cons-cells from " << size << " in total\n";
     }
 }

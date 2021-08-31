@@ -1,41 +1,11 @@
-/*********************************************************************************/ /**
- * @file stream.cpp
- *
- * @version   0.1
- * @date      2018-
- * @author    Paul Pudewills
- * @copyright MIT License
- *************************************************************************************/
-#include <cstring>
-
-#include "port.hpp"
-#include "scheme.hpp"
+#include "streamop.h"
 
 namespace pscm {
 
-void enable_locale(const char* name)
+OSTREAM& operator<<(OSTREAM& os, Cons& cons)
 {
-    using namespace std::string_literals;
-
-    std::ios_base::sync_with_stdio(false);
-    setlocale(LC_ALL, name);
-
-#ifdef __linux__
-    auto loc = std::locale{ name }
-                   .combine<std::numpunct<wchar_t>>(std::locale(name))
-                   .combine<std::numpunct<char>>(std::locale(name));
-
-    std::locale::global(loc);
-
-    std:: cout.imbue(loc);
-    std:: cerr.imbue(loc);
-    std:: clog.imbue(loc);
-    std:: wcout.imbue(loc);
-    std:: wcerr.imbue(loc);
-    std:: wclog.imbue(loc);
-    std:: cin.imbue(loc);
-    std:: wcin.imbue(loc);
-#endif
+    os << "(" << car(cons) << " " << cdr(cons) << " " << mrk(cons) << ")";
+    return os;
 }
 
 /**
@@ -212,4 +182,5 @@ OSTREAM& operator<<(OSTREAM& os, DisplayManip<Cell> manip)
     std::visit(std::move(stream), static_cast<const Cell::base_type&>(manip.value));
     return os;
 }
+
 } // namespace pscm

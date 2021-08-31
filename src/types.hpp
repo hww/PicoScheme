@@ -13,6 +13,11 @@
 #include <regex>
 #include <string>
 #include <variant>
+#include <tuple>
+#include <set>
+
+
+#include "platform.hpp"
 
 #include "port.hpp"
 #include "symbol.hpp"
@@ -31,7 +36,7 @@ template<typename Cell> struct less;
 using None        = std::monostate;
 using Nil         = std::nullptr_t;
 using Bool        = bool;
-using Char        = wchar_t;
+using Char        = MYCHAR;
 using Cons        = std::tuple</*car*/Cell, /*cdr*/Cell, /*gc-mark*/bool>;
 using String      = std::basic_string<Char>;
 using StringPtr   = std::shared_ptr<String>;

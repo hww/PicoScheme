@@ -16,11 +16,11 @@ namespace pscm {
 
 using namespace std::string_literals;
 
-double str2double(const wchar_t* str, std::size_t* pos = nullptr)
+double str2double(const Char* str, std::size_t* pos = nullptr)
 {
     errno = 0;
-    wchar_t* end;
-    double x = std::wcstod(str, &end);
+    Char* end;
+    double x = STD_STOD(str, &end);
 
     if (errno == ERANGE) { // Ignore it for denormals
         if (!(x != 0 && x > -HUGE_VAL && x < HUGE_VAL))
@@ -120,10 +120,10 @@ Cell Parser::strnum(const String& str)
     Number num;
     Token tok;
 
-    if (!str.compare(0, 2, L"#i"))
+    if (!str.compare(0, 2, MYL("#i")))
         tok = lex_number(str.substr(2), num);
 
-    else if (!str.compare(0, 2, L"#e")) {
+    else if (!str.compare(0, 2, MYL("#e"))) {
         tok = lex_number(str.substr(2), num);
         if (tok == Token::Number)
             num = trunc(num);
@@ -168,7 +168,7 @@ Parser::Token Parser::lex_string(String& str, istream_type& in)
 
 Parser::Token Parser::lex_regex(String& str, istream_type& in)
 {
-    if (str != L"#re" || in.get() != '\"')
+    if (str != MYL("#re") || in.get() != '\"')
         return Token::Error;
 
     if (lex_string(str, in) != Token::String)
@@ -192,7 +192,7 @@ Parser::Token Parser::lex_symbol(const String& str)
 
     return Token::Symbol;
 }
-
+#pragma GCC diagnostic ignored "-Wmultichar"
 Parser::Token Parser::lex_char(const String& str, Char& c, istream_type& in)
 {
     constexpr struct {
@@ -200,85 +200,85 @@ Parser::Token Parser::lex_char(const String& str, Char& c, istream_type& in)
         Int c;
     } stab[]{
         // clang-format off
-            { L"#\\eof",        EOF},
-            { L"#\\alarm",     '\a'},
-            { L"#\\backspace", '\b'},
-            { L"#\\delete",    '\0'},
-            { L"#\\escape",    '\0'},
-            { L"#\\newline",   '\n'},
-            { L"#\\null",      '\0'},
-            { L"#\\return",    '\r'},
-            { L"#\\space",     ' ' },
-            { L"#\\tab",       '\t'},
-            { L"#\\ae",        L'ä'},  { L"#\\AE",        L'Ä'},
-            { L"#\\ue",        L'ü'},  { L"#\\UE",        L'Ü'},
-            { L"#\\oe",        L'ö'},  { L"#\\OE",        L'Ö'},
-            { L"#\\ss",        L'ß'},
-            { L"#\\_0",        L'₀'},  { L"#\\^0",        L'⁰'},
-            { L"#\\_1",        L'₁'},  { L"#\\^1",        L'¹'},
-            { L"#\\_2",        L'₂'},  { L"#\\^2",        L'²'},
-            { L"#\\_3",        L'₃'},  { L"#\\^3",        L'³'},
-            { L"#\\_4",        L'₄'},  { L"#\\^4",        L'⁴'},
-            { L"#\\_5",        L'₅'},  { L"#\\^5",        L'⁵'},
-            { L"#\\_6",        L'₆'},  { L"#\\^6",        L'⁶'},
-            { L"#\\_7",        L'₇'},  { L"#\\^7",        L'⁷'},
-            { L"#\\_8",        L'₈'},  { L"#\\^8",        L'⁸'},
-            { L"#\\_9",        L'₉'},  { L"#\\^9",        L'⁹'},
-            { L"#\\alpha",     L'α'},
-            { L"#\\beta",      L'β'},
-            { L"#\\gamma",     L'γ'},  { L"#\\Gamma",     L'Γ'},
-            { L"#\\delta",     L'δ'},  { L"#\\Delta",     L'Δ'},
-            { L"#\\epsilon",   L'ε'},
-            { L"#\\zeta",      L'ζ'},
-            { L"#\\eta",       L'η'},
-            { L"#\\theta",     L'θ'},
-            { L"#\\iota",      L'ι'},
-            { L"#\\kappa",     L'κ'},
-            { L"#\\lambda",    L'λ'},
-            { L"#\\mu",        L'μ'},
-            { L"#\\nu",        L'ν'},
-            { L"#\\xi",        L'ξ'},  { L"#\\Xi",       L'Ξ'},
-            { L"#\\omicron",   L'ο'},
-            { L"#\\pi",        L'π'},  { L"#\\Pi",       L'Π'},
-            { L"#\\rho",       L'ρ'},
-            { L"#\\tau",       L'τ'},
-            { L"#\\sigma",     L'σ'},  { L"#\\Sigma",    L'Σ'},
-            { L"#\\upsilon",   L'υ'},
-            { L"#\\phi",       L'φ'},  { L"#\\Phi",      L'Φ'},
-            { L"#\\chi",       L'χ'},
-            { L"#\\psi",       L'ψ'},  { L"#\\Psi",      L'Ψ'},
-            { L"#\\omega",     L'ω'},  { L"#\\Omega",    L'Ω'},
-            { L"#\\le",        L'≤'},
-            { L"#\\ge",        L'≥'},
-            { L"#\\sim",       L'∼'},
-            { L"#\\simeq",     L'≃'},
-            { L"#\\approx",    L'≈'},
-            { L"#\\nabla",     L'∇'},
-            { L"#\\nabla",     L'∇'},
-            { L"#\\nabla",     L'∇'},
-            { L"#\\sum",       L'∑'},
-            { L"#\\prod",      L'∏'},
-            { L"#\\int",       L'∫'},
-            { L"#\\oint",      L'∮'},
-            { L"#\\pm",        L'±'},
-            { L"#\\div",       L'÷'},
-            { L"#\\cdot",      L'·'},
-            { L"#\\star",      L'⋆'},
-            { L"#\\circ",      L'∘'},
-            { L"#\\bullet",    L'•'},
-            { L"#\\diamond",   L'◇'},
-            { L"#\\lhd",       L'◁'},
-            { L"#\\rhd",       L'▷'},
-            { L"#\\trup",      L'△'},
-            { L"#\\trdown",    L'▽'},
-            { L"#\\times",     L'×'},
-            { L"#\\otimes",    L'⊗'},
-            { L"#\\in",        L'∈'},
-            { L"#\\notin",     L'∉'},
-            { L"#\\subset",    L'⊂'},
-            { L"#\\subseteq",  L'⊆'},
-            { L"#\\in",        L'∈'},
-            { L"#\\infty",     L'∞'},
+            { MYL("#\\eof"),        EOF},
+            { MYL("#\\alarm"),     '\a'},
+            { MYL("#\\backspace"), '\b'},
+            { MYL("#\\delete"),    '\0'},
+            { MYL("#\\escape"),    '\0'},
+            { MYL("#\\newline"),   '\n'},
+            { MYL("#\\null"),      '\0'},
+            { MYL("#\\return"),    '\r'},
+            { MYL("#\\space"),     ' ' },
+            { MYL("#\\tab"),       '\t'},
+            { MYL("#\\ae"),        MYL('ä')},  { MYL("#\\AE"),        MYL('Ä')},
+            { MYL("#\\ue"),        MYL('ü')},  { MYL("#\\UE"),        MYL('Ü')},
+            { MYL("#\\oe"),        MYL('ö')},  { MYL("#\\OE"),        MYL('Ö')},
+            { MYL("#\\ss"),        MYL('ß')},
+            { MYL("#\\_0"),        MYL('₀')},  { MYL("#\\^0"),        MYL('⁰')},
+            { MYL("#\\_1"),        MYL('₁')},  { MYL("#\\^1"),        MYL('¹')},
+            { MYL("#\\_2"),        MYL('₂')},  { MYL("#\\^2"),        MYL('²')},
+            { MYL("#\\_3"),        MYL('₃')},  { MYL("#\\^3"),        MYL('³')},
+            { MYL("#\\_4"),        MYL('₄')},  { MYL("#\\^4"),        MYL('⁴')},
+            { MYL("#\\_5"),        MYL('₅')},  { MYL("#\\^5"),        MYL('⁵')},
+            { MYL("#\\_6"),        MYL('₆')},  { MYL("#\\^6"),        MYL('⁶')},
+            { MYL("#\\_7"),        MYL('₇')},  { MYL("#\\^7"),        MYL('⁷')},
+            { MYL("#\\_8"),        MYL('₈')},  { MYL("#\\^8"),        MYL('⁸')},
+            { MYL("#\\_9"),        MYL('₉')},  { MYL("#\\^9"),        MYL('⁹')},
+            { MYL("#\\alpha"),     MYL('α')},
+            { MYL("#\\beta"),      MYL('β')},
+            { MYL("#\\gamma"),     MYL('γ')},  { MYL("#\\Gamma"),     MYL('Γ')},
+            { MYL("#\\delta"),     MYL('δ')},  { MYL("#\\Delta"),     MYL('Δ')},
+            { MYL("#\\epsilon"),   MYL('ε')},
+            { MYL("#\\zeta"),      MYL('ζ')},
+            { MYL("#\\eta"),       MYL('η')},
+            { MYL("#\\theta"),     MYL('θ')},
+            { MYL("#\\iota"),      MYL('ι')},
+            { MYL("#\\kappa"),     MYL('κ')},
+            { MYL("#\\lambda"),    MYL('λ')},
+            { MYL("#\\mu"),        MYL('μ')},
+            { MYL("#\\nu"),        MYL('ν')},
+            { MYL("#\\xi"),        MYL('ξ')},  { MYL("#\\Xi"),       MYL('Ξ')},
+            { MYL("#\\omicron"),   MYL('ο')},
+            { MYL("#\\pi"),        MYL('π')},  { MYL("#\\Pi"),       MYL('Π')},
+            { MYL("#\\rho"),       MYL('ρ')},
+            { MYL("#\\tau"),       MYL('τ')},
+            { MYL("#\\sigma"),     MYL('σ')},  { MYL("#\\Sigma"),    MYL('Σ')},
+            { MYL("#\\upsilon"),   MYL('υ')},
+            { MYL("#\\phi"),       MYL('φ')},  { MYL("#\\Phi"),      MYL('Φ')},
+            { MYL("#\\chi"),       MYL('χ')},
+            { MYL("#\\psi"),       MYL('ψ')},  { MYL("#\\Psi"),      MYL('Ψ')},
+            { MYL("#\\omega"),     MYL('ω')},  { MYL("#\\Omega"),    MYL('Ω')},
+            { MYL("#\\le"),        MYL('≤')},
+            { MYL("#\\ge"),        MYL('≥')},
+            { MYL("#\\sim"),       MYL('∼')},
+            { MYL("#\\simeq"),     MYL('≃')},
+            { MYL("#\\approx"),    MYL('≈')},
+            { MYL("#\\nabla"),     MYL('∇')},
+            { MYL("#\\nabla"),     MYL('∇')},
+            { MYL("#\\nabla"),     MYL('∇')},
+            { MYL("#\\sum"),       MYL('∑')},
+            { MYL("#\\prod"),      MYL('∏')},
+            { MYL("#\\int"),       MYL('∫')},
+            { MYL("#\\oint"),      MYL('∮')},
+            { MYL("#\\pm"),        MYL('±')},
+            { MYL("#\\div"),       MYL('÷')},
+            { MYL("#\\cdot"),      MYL('·')},
+            { MYL("#\\star"),      MYL('⋆')},
+            { MYL("#\\circ"),      MYL('∘')},
+            { MYL("#\\bullet"),    MYL('•')},
+            { MYL("#\\diamond"),   MYL('◇')},
+            { MYL("#\\lhd"),       MYL('◁')},
+            { MYL("#\\rhd"),       MYL('▷')},
+            { MYL("#\\trup"),      MYL('△')},
+            { MYL("#\\trdown"),    MYL('▽')},
+            { MYL("#\\times"),     MYL('×')},
+            { MYL("#\\otimes"),    MYL('⊗')},
+            { MYL("#\\in"),        MYL('∈')},
+            { MYL("#\\notin"),     MYL('∉')},
+            { MYL("#\\subset"),    MYL('⊂')},
+            { MYL("#\\subseteq"),  MYL('⊆')},
+            { MYL("#\\in"),        MYL('∈')},
+            { MYL("#\\infty"),     MYL('∞')},
         }; // clang-format on
     constexpr size_t ntab = sizeof(stab) / sizeof(*stab);
 
@@ -290,9 +290,9 @@ Parser::Token Parser::lex_char(const String& str, Char& c, istream_type& in)
         c = str[2];
         return Token::Char;
 
-    } else if (str.size() > 3 && str[2] == L'x') {
+    } else if (str.size() > 3 && str[2] == MYL('x')) {
         String s{ str.substr(1) };
-        s[0] = L'0';
+        s[0] = MYL('0');
         c = static_cast<Char>(stoi(s));
         return Token::Char;
     } else {
@@ -311,19 +311,19 @@ Parser::Token Parser::lex_char(const String& str, Char& c, istream_type& in)
 //! Lexical analyse a special scheme symbol.
 Parser::Token Parser::lex_special(String& str, istream_type& in)
 {
-    if (str == L"#")
+    if (str == MYL("#"))
         return Token::Vector;
 
     Token tok;
 
     switch (str.at(1)) {
     case 't':
-        if (str == L"#t" || str == L"#true")
+        if (str == MYL("#t") || str == MYL("#true"))
             return Token::True;
         [[fallthrough]];
 
     case 'f':
-        if (str == L"#f" || str == L"#false")
+        if (str == MYL("#f") || str == MYL("#false"))
             return Token::False;
         [[fallthrough]];
 

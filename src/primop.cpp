@@ -20,6 +20,9 @@
 #include "procedure.hpp"
 #include "scheme.hpp"
 
+//#define PSCM_REGEXPS
+//#ifdef PSCM_DICTIONARY
+
 using varg = std::vector<pscm::Cell>;
 
 namespace pscm::primop {
@@ -1817,7 +1820,10 @@ static Cell readline(Scheme& scm, const varg& args)
     String str;
     if (args.empty()) {
         auto& is = scm.inPort().stream();
+#ifndef PLATFORM_ESP32
+        // ESP 32 requires two times enter to get the line
         is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+#endif
         std::getline(is, str);
     } else {
         auto& port = *get<PortPtr>(args[0]);
@@ -1979,7 +1985,7 @@ static Cell map(Scheme& scm, const SymenvPtr& senv, const varg& args)
         }
     }
 }
-
+#ifdef PSCM_REGEXPS
 /**
  * Return a regular expression object from argument string.
  * Scheme function (regex "regex"
@@ -2063,7 +2069,9 @@ static Cell regex_search(const varg& args)
     }
     return vres->size() ? Cell{ vres } : Cell{ false };
 }
+#endif
 
+#ifdef PSCM_DICTIONARY
 static Cell make_dict(Scheme& scm, const SymenvPtr& env, const varg& args)
 {
     if (args.empty())
@@ -2130,6 +2138,7 @@ static Cell list2dict(const varg& args)
 
     return dict;
 }
+#endif
 
 } // namespace pscm::primop
 
@@ -2308,7 +2317,7 @@ Cell call(Scheme& scm, const SymenvPtr& senv, Intern primop, const varg& args)
         return primop::makelist(scm, args);
     case Intern::op_isnil:
         return is_nil(args.at(0));
-    case Intern::op_ispair:
+   case Intern::op_ispair:
         return is_pair(args.at(0));
     case Intern::op_islist:
         return is_list(args.at(0));
@@ -2582,6 +2591,7 @@ Cell call(Scheme& scm, const SymenvPtr& senv, Intern primop, const varg& args)
         scm.load(*get<StringPtr>(args.at(0)), senv);
         return none;
 
+#ifdef PSCM_REGEXPS
     /* Section extensions - Regular expressions */
     case Intern::op_regex:
         return primop::regex(scm, args);
@@ -2589,12 +2599,13 @@ Cell call(Scheme& scm, const SymenvPtr& senv, Intern primop, const varg& args)
         return primop::regex_match(args);
     case Intern::op_regex_search:
         return primop::regex_search(args);
+#endif
 
     /* Section extensions - Date, clock and time measurements */
     case Intern::op_clock:
         return std::make_shared<Clock>();
     case Intern::op_clock_toc:
-        return Number{ get<ClockPtr>(args.at(0))->toc() };
+        return Number{get<ClockPtr>(args.at(0))->toc() };
     case Intern::op_clock_tic:
         return ((void)get<ClockPtr>(args.at(0))->tic(), none);
     case Intern::op_clock_pause:
@@ -2606,7 +2617,7 @@ Cell call(Scheme& scm, const SymenvPtr& senv, Intern primop, const varg& args)
         return Number{ use_count(args.at(0)) };
     case Intern::op_hash:
         return Number{ pscm::hash<Cell>{}(args.at(0)) };
-
+#ifdef PSCM_DICTIONARY
     /* Section extensions - Dictionary as std::map */
     case Intern::op_make_dict:
         return primop::make_dict(scm, senv, args);
@@ -2631,7 +2642,7 @@ Cell call(Scheme& scm, const SymenvPtr& senv, Intern primop, const varg& args)
         return primop::dict2list(scm, args);
     case Intern::op_list2dict:
         return primop::list2dict(args);
-
+#endif
     default:
         throw std::invalid_argument("invalid primary opcode");
     }
@@ -2913,18 +2924,19 @@ void add_environment_defaults(Scheme& scm)
           /* Section 6.14: System interface */
           { scm.symbol("load"), Intern::op_load },
 
+#ifdef PSCM_REGEXPS
           /* Extension: regular expressions */
           { scm.symbol("regex"),        Intern::op_regex },
           { scm.symbol("regex-match"),  Intern::op_regex_match },
           { scm.symbol("regex-search"), Intern::op_regex_search },
-
+#endif
           /* Extension: clock */
           { scm.symbol("clock"),        Intern::op_clock},
           { scm.symbol("clock-tic"),    Intern::op_clock_tic},
           { scm.symbol("clock-toc"),    Intern::op_clock_toc},
           { scm.symbol("clock-pause"),  Intern::op_clock_pause},
           { scm.symbol("clock-resume"), Intern::op_clock_resume},
-
+#ifdef PSCM_DICTIONARY
           /* Extension: dictionary */
           { scm.symbol("make-dict"),    Intern::op_make_dict},
           { scm.symbol("dict-size"),    Intern::op_dict_size},
@@ -2937,7 +2949,7 @@ void add_environment_defaults(Scheme& scm)
           { scm.symbol("dict-erase!"),  Intern::op_dict_erase},
           { scm.symbol("dict->list"),   Intern::op_dict2list},
           { scm.symbol("list->dict"),   Intern::op_list2dict},
-
+#endif
           { scm.symbol("use-count"),    Intern::op_usecount },
           { scm.symbol("hash"),         Intern::op_hash },
        });

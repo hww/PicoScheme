@@ -21,6 +21,7 @@
 #include <sstream>
 #include <variant>
 
+#include "platform.hpp"
 #include "utils.hpp"
 
 namespace pscm {
@@ -43,14 +44,14 @@ template <typename T>
 DisplayManip<T> display(const T& val) { return { val }; }
 
 //! Output stream operator for scheme (display <expr>) output.
-std::wostream& operator<<(std::wostream& os, DisplayManip<Cell> cell);
+OSTREAM& operator<<(OSTREAM& os, DisplayManip<Cell> cell);
 
 //! Default output stream operator for scheme (write <expr>) output.
-std::wostream& operator<<(std::wostream& os, const Cell& cell);
+OSTREAM& operator<<(OSTREAM& os, const Cell& cell);
 
 //! Output stream operator to write essential opcodes
 //! with their descriptive scheme symbol name.
-std::wostream& operator<<(std::wostream& os, Intern opcode);
+OSTREAM& operator<<(OSTREAM& os, Intern opcode);
 
 /**
  * Scheme io-port fascade to represent either an std::iostream,
@@ -114,20 +115,20 @@ public:
     using stream_type::flush;
 
     explicit StandardPort(openmode mode = stream_type::out)
-        : stream_type{ std::wcin.rdbuf() }
+        : stream_type{ CIN.rdbuf() }
         , Port<Char>{ *this, mode }
     {
         pscm::enable_locale();
 
         if (mode & stream_type::out) {
-            stream_type::set_rdbuf(std::wcout.rdbuf());
-            stream_type::copyfmt(std::wcout);
-            stream_type::clear(std::wcout.rdstate());
+            stream_type::set_rdbuf(COUT.rdbuf());
+            stream_type::copyfmt(COUT);
+            stream_type::clear(COUT.rdstate());
         }
         if (mode & stream_type::in) {
-            stream_type::set_rdbuf(std::wcin.rdbuf());
-            stream_type::copyfmt(std::wcin);
-            stream_type::clear(std::wcin.rdstate());
+            stream_type::set_rdbuf(CIN.rdbuf());
+            stream_type::copyfmt(CIN);
+            stream_type::clear(CIN.rdstate());
         }
     }
     bool isStandardPort() const final { return true; }

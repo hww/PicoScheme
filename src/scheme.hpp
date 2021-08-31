@@ -54,7 +54,7 @@ public:
     Cons* cons(CAR&& car, CDR&& cdr)
     {
         if (store_size + dflt_gccycle_count < store.size()) {
-            std::wcerr << "Garbage collector cycle" << std::endl;
+            CERR << "Garbage collector cycle" << std::endl;
             //gc.collect(*this, topenv);
             store_size = store.size();
         }
@@ -122,7 +122,7 @@ public:
     template <typename FunctionT>
     FunctionPtr function(const SymenvPtr& env, FunctionT&& fun)
     {
-        return function(env, String{ L"λ" }, std::forward<FunctionT>(fun));
+        return function(env, String{ MYL("λ") }, std::forward<FunctionT>(fun));
     }
 
     Port<Char>& outPort() const { return *m_stdout; } //!< return a shared-pointer to the default input port
@@ -231,12 +231,13 @@ private:
     PortPtr m_stdin = std::make_shared<standard_port>(standard_port::in);
     PortPtr m_stdout = std::make_shared<standard_port>(standard_port::out);
 
-    GCollector gc;
     std::list<Cons> store;
     size_t store_size = 0;
 
     Symtab symtab{ dflt_bucket_count };
     SymenvPtr topenv = nullptr;
+public:
+    GCollector gc;
 };
 
 } // namespace pscm
