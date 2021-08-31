@@ -1,12 +1,11 @@
 PicoScheme ESP32
 ==========
 
-==========
-Annotation
+**Annotation**
 
-*The branch of https://github.com/arichel/PicoScheme but modifyed for ESP32 MCU*
-==========
+The branch of [PicoScheme](https://github.com/arichel/PicoScheme) but modifyed for ESP32 MCU
 
+### Introduction ###
 A small, embeddable scheme interpreter in c++17. This project started as a
 test bed to evaluate the new [std::variant] class template as plain c-union
 replacement and to test shared, reference counting pointers for basic memory
