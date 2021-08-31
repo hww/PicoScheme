@@ -5,61 +5,6 @@ PicoScheme ESP32
 
 The branch of [PicoScheme](https://github.com/arichel/PicoScheme) but modifyed for ESP32 MCU and *idf* toolschain. 
 
-## Usage ###
-
-Drop it to the *components* folder of your ESP32 project, then enable exceptions with *menuconfig*. Also enable C++17 support for your project (see below)
-
-```
-cmake_minimum_required(VERSION 3.5)
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-include($ENV{IDF_PATH}/tools/cmake/project.cmake)
-
-project(esp32)
-```
-
-The next samplecode shows how to initialize the **scheme**
-
-```
-	pscm::Scheme scm;
-	pscm::Parser parser(scm);
-	scm.gc.logging(true);
-	using pscm::Intern, pscm::Cell, pscm::str, pscm::nil;
-	scm.function("greet", [cntr = 0](Scheme& scm, const SymenvPtr&, const std::vector<Cell>&) mutable -> Cell {
-		return scm.list(pscm::str("hello world"), pscm::num(cntr++));
-	});
-```
-
-The next samplecode shows how evaluate the *cstring**
-
-```
-extern "C" void scheme_run(pscm::Scheme& scm, pscm::Parser& parser, char* cstr, int* res)
-{
-	std::string str(cstr);
-
-	try {
-		pscm::SymenvPtr env = scm.getenv();
-
-		ISTRINGSTREAM stream(str);
-		Cell expr = parser.read(stream);
-
-		COUT << expr << endl;
-		Cell proc = scm.eval(env, expr);
-		COUT << proc << endl;
-		return;
-
-	} catch (std::bad_variant_access& e) {
-		cout << e.what() << endl;
-
-	} catch (std::invalid_argument& e) {
-		cout << e.what() << endl;
-	} catch (std::exception& e) {
-		cout << e.what() << endl;
-	}
-}
-```
-
 ### Introduction ###
 A small, embeddable scheme interpreter in c++17. This project started as a
 test bed to evaluate the new [std::variant] class template as plain c-union
@@ -193,6 +138,61 @@ which is basically a [std::list] container of *Cons*-cell pairs.
 
 ### Garbage collector ###
 todo...
+
+## Usage with ESP32 ###
+
+Drop it to the *components* folder of your ESP32 project, then enable exceptions with *menuconfig*. Also enable C++17 support for your project (see below)
+
+```
+cmake_minimum_required(VERSION 3.5)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+
+project(esp32)
+```
+
+The next samplecode shows how to initialize the **scheme**
+
+```
+	pscm::Scheme scm;
+	pscm::Parser parser(scm);
+	scm.gc.logging(true);
+	using pscm::Intern, pscm::Cell, pscm::str, pscm::nil;
+	scm.function("greet", [cntr = 0](Scheme& scm, const SymenvPtr&, const std::vector<Cell>&) mutable -> Cell {
+		return scm.list(pscm::str("hello world"), pscm::num(cntr++));
+	});
+```
+
+The next samplecode shows how evaluate the *cstring**
+
+```
+extern "C" void scheme_run(pscm::Scheme& scm, pscm::Parser& parser, char* cstr, int* res)
+{
+	std::string str(cstr);
+
+	try {
+		pscm::SymenvPtr env = scm.getenv();
+
+		ISTRINGSTREAM stream(str);
+		Cell expr = parser.read(stream);
+
+		COUT << expr << endl;
+		Cell proc = scm.eval(env, expr);
+		COUT << proc << endl;
+		return;
+
+	} catch (std::bad_variant_access& e) {
+		cout << e.what() << endl;
+
+	} catch (std::invalid_argument& e) {
+		cout << e.what() << endl;
+	} catch (std::exception& e) {
+		cout << e.what() << endl;
+	}
+}
+```
 
 MIT Licence
 -----------
