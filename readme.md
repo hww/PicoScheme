@@ -3,7 +3,7 @@ PicoScheme ESP32
 
 **Annotation**
 
-The branch of [PicoScheme](https://github.com/arichel/PicoScheme) but modifyed for ESP32 MCU and *idf* toolschain. It was sucessfully used for [The haptic feedback rifle for Oculus Quest](https://hww.github.io/projects/ar_vr_rifle/) with only 4MG version of ESP32 microcontroller.
+The branch of [PicoScheme](https://github.com/arichel/PicoScheme) but modifyed for ESP32 MCU and *idf* toolschain. It was sucessfully used for [The haptic feedback rifle for Oculus Quest](https://hww.github.io/projects/ar_vr_rifle/) with only 4MB version of ESP32 microcontroller.
 
 ### Introduction ###
 A small, embeddable scheme interpreter in c++17. This project started as a
